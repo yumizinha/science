@@ -1,8 +1,8 @@
 ---
-date: "2021-01-24"
-linkTitle: Data Science
-summary: An example of using Wowchemy's Book layout for publishing online courses.
-title: "\U0001F4CA Learn Data Science"
+date: "2018/2019"
+linkTitle: PSN
+summary: Notas de aula de João Ricardo Sato.
+title: "\U0001F9E0 Processamento de Sinais Neurais"
 type: book
 ---
 
