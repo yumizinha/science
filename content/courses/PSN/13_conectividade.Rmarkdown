@@ -43,9 +43,8 @@ Escolhemos o Cingulo Posterior centralizado em x=23, y=19 ,z=27 (processamos um 
 require(RNifti)
 
 #Leitura do arquivo
-volume = readNifti("./data/RESTING.hdr")
+volume = readAnalyze("./data/RESTING.img")
 dim(volume)
-
 
 #Dimensoes
 XMAX = dim(volume)[1]

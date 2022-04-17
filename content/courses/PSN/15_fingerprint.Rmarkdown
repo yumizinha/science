@@ -24,7 +24,7 @@ Realizando análise de todas as regiões corticais:
 
 ```{r}
 #Leitura do ID dos sujeitos
-nomes = scan("./data/CARAS.txt", what = "string")
+nomes = scan("./data/fingerprint/CARAS.txt", what = "string")
 Nsujeitos = length(nomes) # numero de individuos
 
 ```
@@ -47,7 +47,7 @@ for(sujeito in 1:Nsujeitos){
 
 # Leitura de dados do SCAN1
 # Concatena o prefixo e sufixo no ID do sujeito
-   STRINGNOME = paste("S1-GordonConnCOR-", nomes[sujeito],
+   STRINGNOME = paste("./data/fingerprint/S1-GordonConnCOR-", nomes[sujeito],
            ".txt", sep="")
    a = read.table(STRINGNOME)
    
@@ -55,7 +55,7 @@ for(sujeito in 1:Nsujeitos){
    SCAN1[sujeito,,] = as.matrix(a[5:337, 5:337]) #pega somente as ROIS do atlas
 
 # Leitura de dados do SCAN2
-   STRINGNOME = paste("S2-GordonConnCOR-", nomes[sujeito],
+   STRINGNOME = paste("./data/fingerprint/S2-GordonConnCOR-", nomes[sujeito],
            ".txt", sep="")
    a = read.table(STRINGNOME)
    
@@ -133,11 +133,11 @@ Analisando a default-mode network:
 ###### ANALISE DA DEFAULT-MODE NETWORK
 
 #Leitura do ID dos sujeitos
-nomes=scan("CARAS.txt",what="string")
+nomes=scan("./data/fingerprint/CARAS.txt",what="string")
 Nsujeitos=length(nomes)
 
 #Leitura do arquivo com o label das subredes cerebrais
-SUBREDES=read.table("IDnet5-337.txt")[,2]
+SUBREDES=read.table("./data/fingerprint/IDnet5-337.txt")[,2]
 table(SUBREDES)
 ROIS=which(SUBREDES=="Default")
 NROIS=length(ROIS)
@@ -151,13 +151,13 @@ SCAN2=array(0,c(Nsujeitos,NROIS,NROIS))
 for(sujeito in 1:Nsujeitos){
 
 # Leitura de dados do SCAN1
-   STRINGNOME=paste("S1-GordonConnCOR-",nomes[sujeito],
+   STRINGNOME=paste("./data/fingerprint/S1-GordonConnCOR-",nomes[sujeito],
            ".txt",sep="")
    a=read.table(STRINGNOME)
    SCAN1[sujeito,,]=as.matrix(a[5:337,5:337])[ROIS,ROIS] #pega somente as ROIS do atlas
 
 # Leitura de dados do SCAN2
-   STRINGNOME=paste("S2-GordonConnCOR-",nomes[sujeito],
+   STRINGNOME=paste("./data/fingerprint/S2-GordonConnCOR-",nomes[sujeito],
            ".txt",sep="")
    a=read.table(STRINGNOME)
    SCAN2[sujeito,,]=as.matrix(a[5:337,5:337])[ROIS,ROIS] #pega somente as ROIS do atlas
