@@ -1,0 +1,247 @@
+---
+title: "Análise Espectral"
+author: "Amanda Yumi"
+highlight: true
+date: "2018-10-01"
+output: html_document
+type: book
+weight: 60
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# Gambi pra funcionar o ts.plot:
+graphics.off()
+par("mar")
+par(mar=c(1,1,1,1))
+```
+
+O conteúdo dessa aula auxilia no entendimento da amostragem no domínio da frequência e reconstrução de sinais de tempo discreto.
+No quesito de análise de dados com EEG, os processos de transformação de amostras do domínio do tempo para o domínio da frequência. Estas incluem tanto a análise direta do espectro de frquência, bem como convoluções. Existem variações relacionadas com a transformada, dependendo do tipo de cada função. 
+
+A análise espectral decompõe o sinal de EEG em suas componentes fundamentais (harmônicos) que geram frequências conhecidas que podem ser distinguidas entre si.
+
+O sinal de EEG é composto de várias outras ondas, de modo que a análise espectral consiste em realizar uma decomposição da onda de EEG em diversas ondas senoidais (ou cossenoides). Essa decomposição consiste na aplicação da *transformada de Fourier*.
+
+A transformada de Fourier converte uma seqüência finita de amostras igualmente espaçadas de uma função em uma seqüência de comprimento igual de amostras igualmente espaçadas da transformada de Fourier em tempo discreto (DTFT), que é uma função de frequência de valor complexo (na literatura poderá conferir que muitas vezes o número imaginário $i$ pode ser representado como $j$ para evitar possíveis confusões com intensidade de corrente, também representadas pelo mesmo símbolo).
+
+O intervalo no qual o DTFT é amostrado é recíproco a duração da sequência de entrada. Uma DFT inversa é uma série de Fourier, possuindo os mesmos valores de amostra da seqüência de entrada original. A DFT é, portanto, considerada uma representação do domínio da frequência da sequência de entrada original. Se a sequência original abranger todos os valores diferentes de zero de uma função, seu DTFT é contínuo (e periódico), e o DFT fornece amostras discretas de um ciclo. Se a sequência original é um ciclo de uma função periódica, a DFT fornece todos os valores diferentes de zero de um ciclo de DTFT.
+
+
+O sinal de EEG de: $X_T = \{X_0, X_1, ..., X_{t-1}\}$ é denotado pela decomposição:
+
+$$
+\begin{align}
+C_{k} = \sum_{T=0}^{t-1} X_{T} \hspace{1mm} \sin(\lambda_k T+\phi) && \text{(sendo} \lambda_k= \frac{2\pi i}{N} \text{a frequência de Fourier)}
+\end{align}
+$$
+
+Pelas relações trigonométricas:
+
+$$
+\begin{align}
+\sin(\lambda t+ \phi) =  \sin(\lambda t) \cos(\phi) + \sin(\phi)\cos(\lambda t)
+&& \text{(soma de arcos)}\\
+e^{jx} = \cos(x)+j\sin(x) && \text{(forma de Euler)}
+\end{align}
+$$ 
+
+pode-se representar a decomposição do sinal de EEG como:
+
+$$C_{k} = \sum_{T=0}^{t-1} X_{T} \hspace{1mm} e^\frac{-2\pi k i}{T}$$
+
+
+```{r}
+T = 100
+lambda1 = 30
+lambda2 = 50
+lambda3 = 110
+
+x= sin(2*pi*lambda1*(1:T)/T) +0.5*sin(2*pi*lambda2*(1:T)/T)
++0.25*sin(2*pi*lambda3*(1:T)/T)
+ts.plot(x)
+```
+
+Ruído-branco Gaussiano é um sinal aleatório com igual intensidade em diferentes frequências, o que lhe dá uma densidade espectral de potência constante. Em termos discretos, é um sinal discreto cujas amostras são vistas como uma seqüência de variáveis aleatórias não autocorrelacionadas com média zero e variância finita.
+Para calcular o espectro, utiliza-se a transformada de Fourier:
+A Transformada rápida de Fourier (em inglês fast Fourier transform, ou FFT) é um algoritmo eficiente para se calcular a Transformada discreta de Fourier (DFT) e a sua inversa. A análise de Fourier converte um sinal do seu domínio original para uma representação no domínio da frequência e vice-versa. 
+Idêntico à definição se T for potência de 2 (ou aproximação de).
+
+A função spectrum realiza a estimativa da densidade espectral de uma série temporal.
+
+```{r}
+hist(rnorm(T))
+x = x+rnorm(T)
+ts.plot(x)
+```
+
+A função spectrum realiza a estimativa da densidade espectral de uma série temporal. O estimador do espectro (periodograma) é definido como "estimado" pois ele faz uma estimativa e não uma média de todos os dados gerados.
+
+Essa análise espectral verifica o valor da amplitude da onda para cada frequência de Fourier. Em EEG, existe um grupo de faixas de frequências que aparecem em situações especificas e a análise espectral permite visualizar o comportamento da amplitude das ondas de EEG para cada um desses grupos, de acordo com o objetivo do estudo, identificando as bandas de frequências:
+
+* Delta <4z
+* Teta 4-7hz
+* Alfa 8-12hz
+* Beta 13-30hz
+* Gama > 30hz
+
+O periodograma no R, gráfico com as frequências é determinado por:
+
+```{r, cache = TRUE}
+ESPECTRO = spectrum(x)
+
+# O eixo x ficaria em 
+
+plot(ESPECTRO$freq, ESPECTRO$spec, type = "l")
+
+```
+
+## Implementando com o banco de dados
+
+Realizando a leitura dos dados:
+
+```{r}
+#leitura dos sinais
+sinais=read.table("./data/OlhosFechados.txt",header=FALSE)
+
+#leitura do nome dos canais
+nomescanais=scan("./data/NOMEScanais.txt",what="string")
+
+dim(sinais)
+nomescanais 
+```
+
+Parametrizando as variáveis iniciais:
+
+```{r}
+#Taxa de amostragem
+HZ=250
+
+#Tamanho da epoca (janela) em segundos
+TAMsegundos=5
+
+#Tamanho da epoca (janela) em caselas do vetor de sinais
+TAM=TAMsegundos*HZ
+
+#Numero de epocas
+Nepocas=floor(nrow(sinais)/TAM)
+
+#Numero de canais
+Ncanais=ncol(sinais)
+```
+
+Criando matriz Espectro para armazenar a média dos periodogramas entre todas as épocas para cada canal.
+As linhas representam diferentes frequências
+As colunas representam os canais
+
+
+```{r, results = 'hide', message = FALSE, cache = TRUE}
+ESPECTRO=matrix(0,TAM/2,Ncanais)
+
+#Calcular para cada canal
+# Escondi a saída de todos os espectros porque tem muitos canais e épocas na saída
+for(canal in 1:Ncanais){  
+  y=0
+  #Calcula a media entre épocas
+  for(epoca in 1:Nepocas){
+    #Descobrir caselas de inicio e fim de cada epoca
+    INICIO=TAM*(epoca-1)+1
+    FIM=epoca*TAM
+    y=y+spectrum(sinais[INICIO:FIM,canal], plot = FALSE)$spec
+  }#for da epoca
+   ESPECTRO[,canal]=y/Nepocas
+}#for do canal
+
+```
+
+## Gráfico do espectro no canal O1, coluna 29.
+
+```{r, cache = TRUE}
+plot((HZ/2)*(1:nrow(ESPECTRO))/nrow(ESPECTRO), ESPECTRO[, 29],
+ type="l", xlab="Frequencia (Hz)", ylab="Potencia (uV^2)")
+
+```
+
+Ajustando o zoom para conseguir visualizar a informação melhor:
+```{r message=FALSE, warning=FALSE, paged.print=FALSE, cache = TRUE}
+IX=10:200
+plot((HZ/2)*IX/nrow(ESPECTRO), ESPECTRO[IX,29],
+ type="l",xlab="Frequencia (Hz)",ylab="Potencia (uV^2)")
+
+#Armazenar o espectro estimado médio de olhos fechados
+ESPECTROof=ESPECTRO
+```
+
+Para armazenar o espectro estimado médio de olhos abertos e colocar os dois no mesmo gráfico:
+
+```{r, cache = TRUE}
+ESPECTROoa=ESPECTRO
+
+##### COLOCAR OS 2 espectros médios no mesmo grafico
+
+#ZOOM no grafico
+IX=10:200
+plot((HZ/2)*IX/nrow(ESPECTROof), ESPECTROof[IX,29],
+ type="l",xlab="Frequencia (Hz)",ylab="Potencia (uV^2)")
+
+legend("topright",c("Olhos Fechados","Olhos Abertos"),lty=c(1,1),
+    col=c(1,2))
+```
+
+No gráfico podemos o espectro para cada frequência (analisar o espectro para cada faixa) e não a evolução em si (pois não está no tempo).
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+
+#Ex1) No codigo de controle de qualidade:
+
+for(canal in 1:Ncanais){
+  for(epoca in 1:Nepocas){
+    #Casela de inicio da epoca
+    INICIO=(epoca-1)*TAM+1
+
+    #Casela de fim da epoca
+    FIM=epoca*TAM
+
+    #Calculo de amplitude
+    DIFERENCA[epoca,canal]=mean(sinais[INICIO:FIM,canal])- median(sinais[INICIO:FIM,canal])
+  }#for da epoca
+}#for dos canais
+
+LIMIAR=20 #Escolhido analisando o histograma. Com todos os canais
+
+#Criar matriz de controle de qualidade de dimensao identica
+#ao da matriz AMPLITUDE. Zero corresponde a epocas sem problema
+#Um sao as epocas onde a amplitude foi maior que um limiar
+CQ=matrix(0,Nepocas,Ncanais)
+CQ[which(DIFERENCA>LIMIAR)]=1
+
+#Altere o codigo para ao invés de calculo de amplitude, o algoritmo para que calcule a diferenca e entre a media e a mediana do sinal nesta epoca:
+for(canal in 1:Ncanais){
+  for(epoca in 1:Nepocas){
+    #Casela de inicio da epoca
+    INICIO=(epoca-1)*TAM+1
+
+    #Casela de fim da epoca
+    FIM=epoca*TAM
+
+    #Calculo de amplitude
+    DIFERENCA[epoca,canal]=mean(sinais[INICIO:FIM,canal])- median(sinais[INICIO:FIM,canal])
+  }#for da epoca
+}#for dos canais
+
+LIMIAR=20 # e descarte as epocas onde esta diferença for maior que 20.
+
+# Armazenando na matriz de Controle de qualidade os dados a serem descartados:
+
+CQ=matrix(0,Nepocas,Ncanais)
+CQ[which(DIFERENCA>LIMIAR)]=1
+
+
+# Ex2) interprete este grafico:
+
+# O periodograma do sinal calculado (média-mediana) a partir de um determinado intervalo aceitável trata-se de uma curva normal (média=mediana).
+# O sinal passado é o que foi considerado como atendendo as condições de uma distribuição normal.
+# O que foi retirado é o Ruído-branco Gaussiano que se refere a um sinal aleatório com igual 
+# intensidade e em diferentes frequências (vide o periodograma), o que resultando numa densidade
+# espectral de potência constante. Em termos discretos, é um sinal discreto cujas amostras são 
+# vistas como uma seqüência de variáveis aleatórias não autocorrelacionadas com média zero e variância finita.
+```
