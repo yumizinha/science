@@ -1,0 +1,315 @@
+---
+title: "Análise 1st e 2nd level"
+author: "Amanda Yumi"
+highlight: true
+date: "2018-10-29"
+output: html_document
+type: book
+weight: 120
+---
+
+
+
+<p>Observações: Movimentação de corpo rígido:</p>
+<p><span class="math display">\[
+\begin{align}
+BOLD_{t} = \alpha + \beta . X_t + (\gamma_1\mu_1 + ...+\gamma_6 \mu_6) + \epsilon_t &amp;&amp; \text{(sendo } X_t \text{ a condição da convolução)}
+\end{align}
+\]</span></p>
+<p>Neste caso, <span class="math inline">\(\gamma_1\mu_1 + ...+\gamma_6 \mu_6\)</span> é a combinação do ajuste de corpos rígidos para ajuste de movimento. São 6 eixos (3 de rotação e 3 de translação). São utilizados pois muitas coletas de fMRI são realizadas com movimento (fala, movimento da mão ou com alguma tarefa que pode gerar movimentação). Alguns pesquisadores sugerem 12 movimentos, que seriam os 6 usuais utilizados e suas derivadas para correção.</p>
+<p>Em event-related, além da condição convoluída pela HRF, inclui também suas derivadas.</p>
+<div id="para-mapas-de-ativação-de-um-indivíduo---1st-level" class="section level2">
+<h2>Para mapas de ativação de um indivíduo - 1st level</h2>
+<p>Se quiser sofisticar a análise com mais acurácia, realizamos os ajustes:</p>
+<p><span class="math display">\[
+\begin{align}
+BOLD_{t} = \alpha + \beta_1 . X_t + \beta_2. X_t&#39; + \epsilon_t &amp;&amp; \text{(sendo } X_t&#39; = X_t - X_{t-1} \text{)}
+\end{align}
+\]</span></p>
+<p>A adição de Kernels de Volterra:</p>
+<p><span class="math display">\[
+\begin{align}
+BOLD_{t} = \alpha + \beta_1 . X_t + \beta_2. V_t&#39; + \epsilon_t &amp;&amp; \text{(sendo } V_t \text{ os kernels de Volterra)}
+\end{align}
+\]</span>
+E no caso dos testes estatísticos de ativação, trabalharia com o <span class="math inline">\(\beta_1\)</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Além disso, trabalha-se com a autocorrelação dos resíduos. Seja o modelo</li>
+</ol>
+<p><span class="math display">\[
+\begin{align}
+Y_{t} = \alpha + \beta . X_t + \epsilon_t
+\end{align}
+\]</span></p>
+<p>neste caso, supondo:
+<span class="math inline">\(\epsilon_t\)</span> com média zero e variância constante (homocedasticidade) e os erros <span class="math inline">\(\epsilon_t\)</span> são independentes</p>
+<p>3.1 Pre-whitening: Aplicação de modelo autoregressivo
+3.2 Estimação não-paramétrica e semi-paramétrica: Descobrir independência dos resíduos
+3.3 Pre-coloring (AR) - Força os resíduos a ter a dependência desejada/conhecida que seja compatível com o modelo estatístico.</p>
+</div>
+<div id="análise-de-fmri" class="section level2">
+<h2>Análise de fMRI:</h2>
+<p>Um conjunto de dados fMRI, pode ser visto como um conjunto de elementos cubóides (isto é, voxels) de dimensão variável, cada qual explicados por uma série temporal associada de tantos pontos de tempo quanto os volumes adquiridos por sessão.</p>
+<p>O objetivo de uma análise estatística (convencional) é determinar quais voxels têm um curso de tempo que se correlaciona com algum padrão conhecido de estimulação ou manipulação experimental. O primeiro passo na análise de dados de ressonância magnética funcional é aplicar uma série de transformações de “pré-processamento” com o objetivo de corrigir vários artefatos potenciais introduzidos na aquisição de dados. Cada transformação pode ser aplicada conforme necessário, dependendo do projeto experimental específico ou protocolo de aquisição. As etapas mais típicas incluem o ajuste de diferenças no tempo de aquisição de fatias de imagem individuais, correção do movimento do assunto, distorção dos dados de indivíduos individuais em um espaço comum (“normalização”) e suavização temporal e espacial (ver Jezzard et al., 2002). Após o pré-processamento, a análise de dados é geralmente realizada em duas etapas: uma análise de primeiro nível separada dos dados de cada indivíduo, seguida de uma análise de segundo nível na qual os resultados de vários assuntos são combinados.</p>
+<p>As etapas de:
+* coleta de dados
+* pré-processamento
+* 1st level
+* e/ou 2nd level</p>
+<p>Onde as análises são feitas em dois tipos:</p>
+<ul>
+<li>1st level: Comparação entre ativação em condições no mesmo indivíduo</li>
+<li>2nd level: Comparação entre condições em um grupo OU comparação entre grupos de indivíduos</li>
+</ul>
+<div id="análise-primeiro-nível" class="section level3">
+<h3>Análise primeiro nível</h3>
+<p>O objetivo da análise estatística de primeiro nível é determinar o quão grande é a contribuição de cada variável preditora <span class="math inline">\(x_i\)</span> para os valores observados de <span class="math inline">\(y\)</span> em um único indivíduo. Isto é, o tamanho de cada parâmetro de escala <span class="math inline">\(\beta_i\)</span> e se é significativamente diferente de zero.</p>
+<p>Seja no primeiro nível a implementação do GLM:</p>
+<p><span class="math display">\[
+\begin{align}
+Y_{t} = \beta . X_t + \epsilon_t
+\end{align}
+\]</span></p>
+<p>onde, <span class="math inline">\(Y\)</span> é um vector de coluna <span class="math inline">\(n × 1\)</span> representando a série temporal do sinal BOLD associada a um único voxel. X é a matriz design <span class="math inline">\(n × p\)</span>, com cada coluna representando uma variável de previsão diferente.</p>
+<p>A abordagem padrão para a análise de fMRI é ajustar o mesmo modelo de forma independente ao tempo de cada voxel. A covariância espacial entre voxels vizinhos é, portanto, tipicamente ignorada no estágio de ajuste do modelo. A presença de mais variáveis de resposta (isto é, voxels) do que observações (ou seja, volumes), juntamente com o objetivo de fazer afirmações topograficamente específicas sobre a atividade BOLD, tem tradicionalmente motivado essa abordagem “massiva-univariada”.</p>
+</div>
+<div id="análise-de-grupo---2nd-level" class="section level3">
+<h3>Análise de grupo - 2nd level:</h3>
+<p>As análises 2nd level se dividem em fixed effects (conclusões nos indivíduos que participaram do estudo) ou mixed effects/random para conclusões de onde os indivíduos foram amostrados. Em mixed effects, utiliza-se um grupo para amostrar um comportamento de uma população.</p>
+<p>Na análise de grupo, podemos aplicar diversos testes de hipóteses, como teste <span class="math inline">\(\lambda^2\)</span> (chi-quadrado), teste-T, correlação de Pearson. Com o GLM, é possível fazer parte destes testes.</p>
+<p><span class="math display">\[
+\begin{align}
+Y_{i} = \alpha + \beta_1 . X_i + \beta_2.Z_i+... + \epsilon_t
+\end{align}
+\]</span>
+supondo:
+<span class="math inline">\(\epsilon_t\)</span> com média zero e variância constante (homocedasticidade) e os erros <span class="math inline">\(\epsilon_t\)</span> são independentes</p>
+<p>Exemplo: Suponha que para um voxel X, Y, Z temos os <span class="math inline">\(\beta\)</span>’s de uma condição experimental para N indivíduos. Como testar se na população de onde os N indivíduos foram amostrados se o <span class="math inline">\(\beta &gt; 0\)</span>?</p>
+<p>Para N-indivíduos, terei N cérebros para analisar. Para cada indivíduo tenho um <span class="math inline">\(\beta_i\)</span> atribuído a cada um:</p>
+<p><span class="math display">\[\begin{align}=
+\begin{bmatrix}
+\\ \beta_1
+\\ \beta_2
+\\ ...
+\\ \beta_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<div id="teste-para-um-grupo" class="section level4">
+<h4>Teste para um grupo:</h4>
+<p>Para testar se esse <span class="math inline">\(\beta\)</span>, basta testar com teste-T se o <span class="math inline">\(\alpha&gt;0\)</span> considerando o modelo de $ Y = + _t$ (<span class="math inline">\(\epsilon\)</span> com média zero):</p>
+<p><span class="math display">\[\begin{align} Y = 
+\begin{bmatrix}
+\\ \beta_1
+\\ \beta_2
+\\ ...
+\\ \beta_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>e</p>
+<p><span class="math display">\[\begin{align} X = 
+\begin{bmatrix}
+\\ 1
+\\ 1
+\\ ...
+\\ 1
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>Isso é equivalente a um teste T para uma amostra.</p>
+</div>
+<div id="primeiro-método-comparando-dois-grupos" class="section level4">
+<h4>PRIMEIRO método: Comparando dois grupos:</h4>
+<p>Por exemplo sejam as matrizes:</p>
+<p><span class="math display">\[\begin{align} X = 
+\begin{bmatrix} Controle
+\\ \beta_1
+\\ \beta_2
+\\ ...
+\\ \beta_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>e pacientes:</p>
+<p><span class="math display">\[\begin{align} X = 
+\begin{bmatrix} Pacientes
+\\ \beta_1
+\\ \beta_2
+\\ ...
+\\ \beta_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>O modelo de GLM utilizado é:</p>
+<p><span class="math inline">\(Y_i = \beta_1.C_i + \beta_2.P_i + \epsilon_t\)</span>
+note que não há intercepto <span class="math inline">\(\alpha\)</span><br />
+e:
+<span class="math inline">\(Y_i\)</span> é o coeficiente de ativação do indivíduo:<br />
+<span class="math inline">\(i=\)</span> {1, 2, …, <span class="math inline">\(N_c\)</span>, <span class="math inline">\(N_c\)</span>, …, <span class="math inline">\((N_c+N_p)\)</span><br />
+<span class="math inline">\(C_i=1\)</span> se o indivíduo <span class="math inline">\(i\)</span> é controle e zero caso contrário <span class="math inline">\(P_i=1\)</span> se o indivíduo é paciente e zero caso contrário</p>
+<p><span class="math display">\[ Y= 
+\left(\begin{array}{cc} 
+\beta_1^c \\
+\beta_2^c \\
+... \\
+\beta_N^p
+\end{array}\right),  X=
+\left(\begin{array} 1
+1 &amp; 0\\ 
+1 &amp; 0 \\
+1 &amp; 0 \\
+... &amp; ...\\
+0 &amp; 1 \\
+0 &amp; 1 \\
+0 &amp; 1 \\
+\end{array}\right)
+\]</span></p>
+<p>Considerando a base a qual os 37 primeiros indivíduos são controles saudáveis e os demais são pacientes com Parkinson.</p>
+<p>Implementando no R:</p>
+<pre class="r"><code>#Leitura de biblioteca
+require(RNifti)</code></pre>
+<pre><code>## Carregando pacotes exigidos: RNifti</code></pre>
+<pre class="r"><code>#Leitura dos dados
+betas = readNifti(&quot;./data/grupo37C-P.nii&quot;)
+dim(betas)</code></pre>
+<pre><code>## [1] 45 54 45 92</code></pre>
+<pre class="r"><code># imagem axial do décimo individuo:
+#imagem axial (z=20) do decimo individuo na fatia 20
+image(betas[,, 20, 10])</code></pre>
+<p><img src="/courses/PSN/11_contraste_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Para um único voxel 20, 20, 20:</p>
+<pre class="r"><code>Y = betas[20, 20, 20,]
+X = matrix(0, 92, 2)
+# Como 1: 37 são controle e do 38:92 são pacientes:
+
+# Variável dummy para controles
+X[1:37, 1] = 1
+
+# Variável dummy para pacientes:
+X[38:92, 2] = 1</code></pre>
+<p>Ajustando o modelo - GLM:</p>
+<pre class="r"><code>#Ajustar o GLM
+#o -1 na formula serve para tirar o intercepto
+modelo = lm(Y~-1+X[, 1] + X[, 2])
+summary(modelo)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y ~ -1 + X[, 1] + X[, 2])
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.50669 -0.15868 -0.03905  0.09441  1.15112 
+## 
+## Coefficients:
+##        Estimate Std. Error t value Pr(&gt;|t|)    
+## X[, 1]  0.48435    0.04685   10.34   &lt;2e-16 ***
+## X[, 2]  0.44014    0.03843   11.45   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.285 on 90 degrees of freedom
+## Multiple R-squared:  0.7256, Adjusted R-squared:  0.7195 
+## F-statistic:   119 on 2 and 90 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Se olhar o <span class="math inline">\(\beta_1\)</span> são as variáveis do grupo controle e <span class="math inline">\(\beta_2\)</span> do grupo de pacientes.</p>
+<p>Analisando o teste de hipóteses e a ativação dos respectivos controles. Para ativação <span class="math inline">\(beta_1 &gt; 0\)</span>.
+Olhando o resultado vemos que o p-valor é muito pequeno, portanto, os controles ativam nesse voxel. O mesmo vale para o grupo de pacientes.</p>
+<p>Para entender se o controle ativa MAIS que o de pacientes:
+<span class="math inline">\(\beta_1 &gt; \beta_2\)</span>. No R esse teste não é tão simples de se verificar.</p>
+</div>
+<div id="outro-método-grupos-de-referência" class="section level4">
+<h4>Outro método: Grupos de referência</h4>
+<p><span class="math inline">\(Y_i = \alpha + \beta_2.P_i + \epsilon_t\)</span>
+<span class="math inline">\(P_i=1\)</span> se o indivíduo é paciente e zero caso contrário</p>
+<p>Para controles:
+<span class="math inline">\(Y_i = \alpha + \epsilon_i\)</span></p>
+<p>Para pacientes:
+<span class="math inline">\(Y_i= \alpha+ \beta + \epsilon_i\)</span>
+<span class="math inline">\(\beta\)</span> é o incremento na média em relação aos controles.</p>
+<p>Neste caso:</p>
+<p><span class="math display">\[ Y= 
+\left(\begin{array}{cc} 
+\beta_1 \\
+\beta_2 \\
+... \\
+\beta_{(N_c+N_p)}
+\end{array}\right),  X=
+\left(\begin{array} 1
+1 &amp; 0\\ 
+1 &amp; 0 \\
+1 &amp; 0 \\
+... &amp; ...\\
+1 &amp; 1 \\
+1 &amp; 1 \\
+1 &amp; 1 \\
+\end{array}\right)
+\]</span></p>
+<p>Implementando para o mesmo voxel 20,20,20:</p>
+<pre class="r"><code>### METODO GRUPO DE REFERENCIA
+#Neste caso sera o controle
+
+#Observacao: os 37 primeiros indiv
+#sao controles saudáveis e os demais
+#sao pacientes com Parkinson
+#GLM
+
+Y = betas[20, 20, 20,]
+X = matrix(0, 92, 2)
+#Intercepto
+X[, 1] = 1
+#Variavel dummy para Pacientes
+X[38:92, 2] = 1
+
+#Ajustar o GLM
+modelo = lm(Y~X[, 2])
+summary(modelo)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y ~ X[, 2])
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.50669 -0.15868 -0.03905  0.09441  1.15112 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.48435    0.04685   10.34   &lt;2e-16 ***
+## X[, 2]      -0.04421    0.06060   -0.73    0.468    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.285 on 90 degrees of freedom
+## Multiple R-squared:  0.00588,    Adjusted R-squared:  -0.005166 
+## F-statistic: 0.5323 on 1 and 90 DF,  p-value: 0.4675</code></pre>
+<p>Analisando especificamente para esse voxel, como <span class="math inline">\(\beta&lt;0\)</span> é como se o grupo de pacientes possui uma ligeira ativação menor que o grupo de controle, Mas ao verificar o p-valor, pode-se verificar que não é significante.</p>
+<p>Para análise dos mapas, analisamos mais o t-valor.</p>
+<p>Fazendo a varredura para todos os voxeis intracranianos (análise de grupo de referência):</p>
+<pre class="r"><code>#GLM em todos os voxels intracranianos
+MAPAT = array(0, c(45, 54, 45, 1))
+
+for(xi in 1:45){
+  for(yi in 1:54){
+    for(zi in 1:45){ 
+     if(betas[xi, yi, zi, 1] != 0){
+      Y = betas[xi, yi, zi, ]
+      X = matrix(0, 92, 2)
+      #Intercepto
+      X[, 1] = 1
+      #Variavel dummy para Pacientes
+      X[38:92, 2] = 1
+
+      #Ajustar o GLM
+      modelo = lm(Y~X[, 2])
+      
+      #Estatistica T do paciente vs controle
+      MAPAT[xi, yi, zi, 1] = summary(modelo)$coef[2, 3]
+    }#fecha if
+}}}#fecha o for do xi,yi,zi
+
+#Salva os mapas em arquivos no formato Analyze (IMG/HDR)
+writeNifti(MAPAT,
+           &quot;./data/MapaControlevsPaciente.nii.gz&quot;,
+           datatype=&quot;float&quot;)</code></pre>
+</div>
+</div>
+</div>

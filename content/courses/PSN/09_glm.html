@@ -1,0 +1,207 @@
+---
+title: "GLM - Modelo Linear Geral"
+author: "Amanda Yumi"
+highlight: true
+date: "2018-10-22"
+output: html_document
+type: book
+weight: 100
+---
+
+
+
+<p>Na ressonância magnética funcional, a hemoglobina que carrega o oxigênio é chamada oxiemoglobina (oxyHb) e ao se desprender do oxigênio essa passa ser chamada desoxihemoglobina (deoxyHb). A oxyHb possui propriedade diamagnética, isto é fraca interação com outros campos magnéticos; tem momento magnético zero e nenhum elétron sem par. Já a deoxyHb é paramagnética, isto é possui maior susceptibilidade magnética, com elétrons não pareados e momento magnético significativo. Assim, na presença de um campo magnético intenso, como da ressonancia, as moleculas de deoxyHb causam uma atenuação do campo magnético e consequentemente uma alteração no contraste da imagem. Como resultado deste comportamento, tem-se o chamado sinal BOLD (Blood Oxigenated level dependent) que é medido pela ressonância magnética funcional (fMRI) - Notas de aula da Cândida.</p>
+<p>O sinal BOLD medido na fMRI está relacionado com a variação da quantidade de deoxyHb na região de estudo. O aumento da atividade cerebral, aumenta o fluxo sanguíneo para aquela região como uma forma de suprir a demanda metabólica. As células que cuidam da estrutura cerebral são as Glias, os astrocitos (metabolismo) e os oligocitrocitos (estrutural). A presença dos oligocitrocitos causam um aumento do vasos sanguíneos, que causa o aumento do fluxo sanguíneo e consequentemente diminuição da deoxyHb e aumento da oxyHb causando um aumento no sinal BOLD, isso é chamado de acoplamento hemodinâmico. Graças ao acoplamento hemodinâmico podemos medir o sinal BOLD e associa-lo a atividade cerebral, possibilitando a realização de inferências sobre o comportamento do cérebro.</p>
+<p>O método GLM – Modelo Linear Geral é um método estatístico utilizado para verificar como uma variável depende de outras variáveis de interesse. Neste modelo a variável dependente é escrita como uma combinação linear das variáveis independentes, onde os coeficientes dessa combinação representam. A regressão linear é utilizada em umas das análises feitas com dados de fMRI, que são os mapas de ativação. Esses mapas mostram as regiões ativadas, de indivíduos ou grupo de indivíduos, quando estão realizando alguma tarefa cognitiva.</p>
+<p>A regressão é dada por:
+<span class="math display">\[
+\begin{align}
+y = \beta xi + \alpha + \epsilon_1
+\end{align}
+\]</span>
+Estimador de mínimos quadrados pelo pela contrução das matrizes:</p>
+<p><span class="math display">\[\begin{align} Y = 
+\begin{bmatrix}
+\\ y_1
+\\ y_2
+\\ y_3
+\\ ...
+\\ y_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>e:</p>
+<p><span class="math display">\[\begin{align} X = 
+\begin{bmatrix}
+\\ 1 &amp;&amp; x_1
+\\ 1 &amp;&amp; x_2
+\\ 1 &amp;&amp; x_3
+\\ ...
+\\ 1 &amp;&amp; x_n
+
+\end{bmatrix}
+
+\end{align}\]</span></p>
+<p>Para conseguir entender melhor como gerar esses mapas de ativação, abaixo segue uma melhor compreensão do modelo. Primeiro implementaremos manualmente e na sequência com o modelo já do próprio R:</p>
+<p>Simulando um modelo linear:</p>
+<pre class="r"><code># Neste caso, y não depende de x:
+X = rnorm(100)
+Erro = rnorm(100)
+Y = 2 + 0*X + Erro
+plot(X, Y)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Estimadores de MMQ para alfa e beta:</p>
+<pre class="r"><code># Cria o vetor Ytil (vertical) e a matriz Xmat (design matrix)
+N = 100 #arbitrario
+Ytil = matrix(Y, N, 1)
+
+# já atribuindo 
+Xmat = matrix(1, N, 2)
+Xmat[ ,2] = X
+
+# Faz os cálculos na multiplicação matricial
+betahat = solve(t(Xmat)%*%Xmat)%*%t(Xmat)%*%Ytil
+
+# estimador é a fórmula que traz a estimativa. 
+Ypredito = betahat[1]+ betahat[2]*X
+plot(X, Y)
+lines(X, Ypredito, col=2)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code># Estimativa dos erros (resíduos)
+residuos = Y-Ypredito
+plot(X, Y)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code>plot(X, residuos)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<p>Modelo de regressão linear múltipla:</p>
+<p>Objetivo: Prever o valor de Y utilizando múltiplas variáveis.
+Fazendo um exemplo com 3:</p>
+<p><span class="math display">\[
+Y_i = \alpha + \beta_1 * X_i + \beta_2*Wi + \beta_3*Zi + \epsilon_i
+\]</span></p>
+<p>Neste caso, quero achar os betas que melhor se ajustam ao que estou querendo modelar.
+Note que é uma função linear, quero saber quais são os pesos que me ajudam a ter uma melhor predição.</p>
+<p>Estimadores de Mínimos quadrados:</p>
+<p><span class="math display">\[\begin{align} Y = 
+\begin{bmatrix}
+\\ y_1
+\\ y_2
+\\ y_3
+\\ ...
+\\ y_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>Supondo um exemplo de regressão múltipla com 3 variáveis:</p>
+<p><span class="math display">\[\begin{align} X = 
+
+\begin{bmatrix} \alpha &amp;&amp; \beta_1 &amp;&amp; \beta_2 &amp;&amp; \beta_3
+\\ 1 &amp;&amp; x_1 &amp;&amp; y_1 &amp;&amp; z_1 
+\\ 1 &amp;&amp; x_2 &amp;&amp; y_2 &amp;&amp; z_2
+\\ 1 &amp;&amp; x_3 &amp;&amp; y_3 &amp;&amp; z_3
+\\ ... &amp;&amp; ... &amp;&amp; ... &amp;&amp; ...
+\\ 1 &amp;&amp; x_n &amp;&amp; y_n &amp;&amp; z_n
+
+\end{bmatrix}
+\end{align}\]</span></p>
+<p>Estimando <span class="math inline">\(beta\)</span>:</p>
+<p><span class="math display">\[\begin{align} \hat{\beta} = (X´ X)^{-1} X´ Y = 
+ 
+\begin{bmatrix}
+\\ \alpha
+\\ \beta_1
+\\ \beta_2
+\\ \beta_3
+\end{bmatrix}
+\end{align}\]</span></p>
+<pre class="r"><code>N=100
+#Simular um modelo linear
+X=rnorm(N)
+Z=rnorm(N)
+W=rnorm(N)
+Erro=rnorm(N)
+Y= 3 + 5*X + 0*W -2*Z + Erro
+
+#Estimadores de Minimos quadrados para alfa e beta1, beta2 e beta3
+#Cria o vetor Ytil (em pe) e a matriz Xmat (Design Matrix)
+Ytil=matrix(Y,N,1)
+Xmat=matrix(1,N,4)
+Xmat[,2]=X
+Xmat[,3]=W
+Xmat[,4]=Z
+
+#Faz os calculos
+betahat= solve(t(Xmat)%*%Xmat)%*%t(Xmat)%*%Ytil
+
+#Estimativa dos erros (residuos)
+residuos=Y-Ypredito</code></pre>
+<p>No R, utlizamos a função lm para implementação do modelo. Neste caso, explicando Y em função das variáveis independentes X, W e Z:</p>
+<pre class="r"><code>modelo = lm(Y~X+W+Z)</code></pre>
+<p>Se comparar os resultados deste com o que foi feito manualmente acima, pode verificar que é idêntico ao que foi calculado manualmente:</p>
+<pre class="r"><code>summary(modelo)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Y ~ X + W + Z)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.5372 -0.5787 -0.1411  0.5047  2.7754 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  2.85185    0.08660  32.930   &lt;2e-16 ***
+## X            5.19544    0.08702  59.703   &lt;2e-16 ***
+## W            0.06157    0.08877   0.694     0.49    
+## Z           -1.92969    0.09516 -20.278   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8585 on 96 degrees of freedom
+## Multiple R-squared:  0.9796, Adjusted R-squared:  0.979 
+## F-statistic:  1540 on 3 and 96 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Olhando a tabela de resultados,</p>
+<ul>
+<li>Estimate = mesmos valores estimados antes</li>
+<li>Std Error: desvio padrão do estimador</li>
+<li>t valor: o valor de t (veremos posteriormente)</li>
+<li>Pr(&gt;|t|): neste modelo se o p-valor for menor que 5%, temos evidências que este valor é estatisticamente diferente de zero</li>
+</ul>
+<p>Olhando o resultado do W, você consegue verificar que o valor-p é muito maior, o que de fato, pela nossa construção é possível verificar.</p>
+<ul>
+<li>R2 ajustado corrige pelo número de variáveis que estão sendo utilizadas</li>
+<li>R não ajustado considera todas as variáveis que estão entrando</li>
+</ul>
+<div id="modelo-polinomial-de-ordem-3" class="section level2">
+<h2>Modelo polinomial de ordem 3</h2>
+<pre class="r"><code>X = rnorm(100)
+Erro = rnorm(100)</code></pre>
+<p>Seja o polinômio de ordem três:
+Y = 2 + 3X +0.5X^2 + 0.1*X^3 + Erro</p>
+<pre class="r"><code>plot(X, Y)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>Y=2 + 3*X + 1*X^2 + 0.1* X^3
+plot(X, Y)
+modelo = lm(Y~X)
+lines(X, modelo$fit, col = 2)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<p>Neste caso é possível verificar que um modelo linear não se adequa diretamente bem, pois trata-se de uma curva.
+Passamos então a construir com mais variáveis.</p>
+<p>Aplicando a regressão lm prevendo Y usando X, W e Z:</p>
+<pre class="r"><code># termo quadrático
+W = X^2
+
+# termo cúbico:
+Z = X^3
+Ypredito = modelo$fit</code></pre>
+<p>Se colocar esse modelo para visualização, podemos ver a seguinte bagunça:</p>
+<pre class="r"><code>plot(X, Y)
+lines(X, Ypredito, col=2)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Isso acontece porque ele liga todos os pontos na ordem em que é gerado, o que não é adequado para esse novo modelo.
+Por isso utilizamos o points:</p>
+<pre class="r"><code>plot(X, Y)
+points(X, Ypredito, col=2)</code></pre>
+<p><img src="/courses/PSN/09_glm_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Na próxima aula, veremos mapas probabilísticos para estimar os mapas de ativação do bold.
+Também é válido para o NIRs.</p>
+</div>
