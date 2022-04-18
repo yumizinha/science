@@ -27,13 +27,6 @@ else{
 
 ```
 
-
-
-
-
-
-
-
 ```{r}
 # Leitura dos dados
 try(sinais = read.table(paste("test_", ID, ".txt", sep="")))

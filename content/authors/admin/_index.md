@@ -1,5 +1,5 @@
 ---
-bio: My interests include ...
+bio: Doutoranda em Engenharia da Informação, ativista de direitos na rede, trabalha com análise de dados neurais e modelos de aprendizagem de máquinas
 education:
   courses:
   - course: Licenciatura em Matemática
@@ -34,6 +34,6 @@ superuser: true
 title: Amanda Yumi
 ---
 
-Amanda Yumi is \ldots
+Doutoranda em Engenharia da Informação, ativista de direitos na rede, trabalha com análise de dados neurais e modelos de aprendizagem de máquinas
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "uploads/resume.pdf" "newtab" >}}resumé{{< /staticref >}}.
