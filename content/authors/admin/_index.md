@@ -1,5 +1,5 @@
 ---
-bio: PhD candidate in Information Engineering at the Federal University of ABC. She has a degree in mathematics from the Institute of Mathematics and Statistics (2011). In her research, she works with Inferences of intercerebral connections using near-infrared spectroscopy (fNIRS) with machine learning.
+bio: PhD candidate in Information Engineering at the Federal University of ABC.
 education:
   courses:
   - course: Licenciatura em Matemática
@@ -35,7 +35,7 @@ superuser: true
 title: Amanda Yumi
 ---
 
-Doutoranda em Engenharia da Informação, ativista de direitos na rede, trabalha com análise de dados neurais e modelos de aprendizagem de máquinas
+PhD candidate in Information Engineering at the Federal University of ABC (financial support: FAPESP, grants number 2019/17907-5). She has a degree in mathematics from the Institute of Mathematics and Statistics (2011). In her research, she works with Inferences of intercerebral connections using near-infrared spectroscopy (fNIRS) with machine learning.
 
 <!--- 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "uploads/resume.pdf" "newtab" >}}resumé{{< /staticref >}}.
