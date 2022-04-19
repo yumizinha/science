@@ -21,7 +21,11 @@ publication_types:
 publishDate: "2019-12-21"
 summary: Test
 tags:
-- Source Themes
+ - Adolescent
+ - Graph
+ - Machine learning
+ - Network
+ - Public health.
 title: "Potential Confounders in the Analysis of Brazilian Adolescent's Health: A Combination of Machine Learning and Graph Theory"
 url_code: 
 url_dataset: ""

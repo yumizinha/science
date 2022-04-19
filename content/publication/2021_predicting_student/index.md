@@ -3,7 +3,7 @@ abstract: Increasing student involvement in classes has always been a challenge 
 authors:
 - admin
 - João Ricardo Sato
-date: "2021"
+date: "2021-02-05"
 doi: "https://doi.org/10.3389/fnhum.2021.622224"
 featured: true
 image:
@@ -16,9 +16,15 @@ publication_short: ""
 publication_types:
 - "2"
 publishDate: "2021-02-05"
-summary: Test
+summary: We collected data with fNIRS from the prefrontal cortex region (PFC) of 18 students while watching a video lecture. Random forests and penalized logistic regression classify correct answers as a function of oxyhemoglobin and deoxyhemoglobin concentration.
 tags:
-- Source Themes
+ - Education
+ - fNIRS
+ - Logistic regression
+ - Machine learning
+ - Neuroscience
+ - Prefrontal cortex
+ - Random forest
 title: "Predicting student performance using machine learning in fNIRS data"
 url_code: 
 url_dataset: ""
