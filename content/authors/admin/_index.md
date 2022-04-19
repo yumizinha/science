@@ -1,5 +1,5 @@
 ---
-bio: Doutoranda em Engenharia da Informação, ativista de direitos na rede, trabalha com análise de dados neurais e modelos de aprendizagem de máquinas
+bio: PhD candidate in Information Engineering at the Federal University of ABC. She has a degree in mathematics from the Institute of Mathematics and Statistics (2011). In her research, she works with Inferences of intercerebral connections using near-infrared spectroscopy (fNIRS) with machine learning.
 education:
   courses:
   - course: Licenciatura em Matemática
