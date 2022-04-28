@@ -5,7 +5,7 @@
 
 main:
   - name: Education
-    url: '#education'
+    url: '#01_education'
     weight: 10
   - name: Publications
     url: '#02_featured'
