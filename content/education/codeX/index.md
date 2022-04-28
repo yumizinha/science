@@ -16,4 +16,4 @@ url_slides: ""
 url_video: ""
 ---
 
-Você trabalha na Base Espacial CodeX. Recentemente houve um acidente e a base foi parcialmente comprometida por radiação. Sua missão é designar robôs para eliminar o material perigoso com segurança. Dentro de uma base segura, você enviará os comandos para o cumprimento das missões. Desenvolva habilidades de programação para garantir a segurança de toda tripulação e boa sorte!
+Você trabalha na Base Espacial CodeX. Recentemente houve um acidente e a base foi parcialmente comprometida por radiação. Sua missão é designar robôs para eliminar o material perigoso com segurança. Dentro de uma base segura, você enviará os comandos para o cumprimento das missões. Desenvolva habilidades de programação para garantir a segurança de toda tripulação e boa sorte! 
