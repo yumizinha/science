@@ -1,5 +1,6 @@
 ---
 date: "2021-02-05T00:00:00Z"
+title: Predicting student performance using fNIRS data
 image:
   caption: We identified the most important channels from the total iterations in training the model.
 tags:

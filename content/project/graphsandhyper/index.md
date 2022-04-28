@@ -1,8 +1,8 @@
 ---
 date: "2022-02-28T00:00:00Z"
+title: Graphs and hyperscanning fNIRS
 image:
-  caption: Hyperscanning is a promising tool for investigating the neurobiological underpinning of interaction and affective bonds. 
-In this context, networks can identify brain functional mechanisms and regions involved during interactions.
+  caption: Hyperscanning is a promising tool for investigating the neurobiological underpinning of interaction and affective bonds. In this context, networks can identify brain functional mechanisms and regions involved during interactions.
 tags:
 - Education
 - Machine Learning

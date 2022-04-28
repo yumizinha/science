@@ -1,5 +1,6 @@
 ---
 date: "2019-12-21T00:00:00Z"
+title: Potential cofounders in Public Health 
 image:
   caption: Hub scores - each variable acroos the five regions (Brazil)
 summary: By using a combination of gradient boosting machines and centrality hub metric, it was possible to identify potential confounders to be considered when conducting association analyses among variables.
