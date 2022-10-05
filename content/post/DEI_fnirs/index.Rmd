@@ -1,0 +1,13 @@
+---
+title: "DEI Travel Award"
+author: ""
+date: 2022-09-15
+categories: ["fNIRS", "Graphs"]
+tags: ["fNIRS", "Graphs"]
+---
+
+# Graphs
+
+The Recipients of the first SfNIRS Diversity Equity and Inclusion travel to PhD student Engineering, Federal University of ABC, Brazil:  Statistical methods in graphs with applications to fNIRS data
+[DEI Travel Awards](https://fnirs2022.fnirs.org/travel-award-recipients/) (fNIRS Conference - Boston).
+
